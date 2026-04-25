@@ -1,0 +1,163 @@
+@import 'tailwindcss';
+@import 'swiper/css';
+@import 'swiper/css/pagination';
+@import 'swiper/css/a11y';
+@import 'swiper/css/autoplay';
+
+@plugin 'flowbite-react/plugin/tailwindcss';
+@source '../../.flowbite-react/class-list.json';
+
+@font-face {
+    font-family: "Lato";
+    src: url("/assets/fonts/Lato-Regular.ttf") format("truetype");
+    font-weight: 400;
+    font-style: normal;
+    unicode-range: U+0000-00FF, U+0100-017F;
+}
+
+@font-face {
+    font-family: "Lato";
+    src: url("/assets/fonts/Lato-Italic.ttf") format("truetype");
+    font-weight: 400;
+    font-style: italic;
+    unicode-range: U+0000-00FF, U+0100-017F;
+}
+
+@font-face {
+    font-family: "Lato";
+    src: url("/assets/fonts/Lato-Bold.ttf") format("truetype");
+    font-weight: 700;
+    font-style: normal;
+    unicode-range: U+0000-00FF, U+0100-017F;
+}
+
+@font-face {
+    font-family: "Lato";
+    src: url("/assets/fonts/Lato-BoldItalic.ttf") format("truetype");
+    font-weight: 700;
+    font-style: italic;
+    unicode-range: U+0000-00FF, U+0100-017F;
+}
+
+@theme {
+    --font-sans: Lato, "Source Hans Sans", "PingFang SC", "SimHei", "黑体", "Microsoft YaHei", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+* {
+    @apply scroll-smooth font-sans;
+}
+
+:root {
+    --standard-blue: #103c74;
+    --standard-red: oklch(39.6% 0.141 25.723);
+    --swiper-theme-color: #83050e !important;
+    --shrink-limit: 750px;
+}
+
+a.inline {
+    @apply text-blue-500 hover:underline;
+}
+
+.secondary {
+    @apply text-gray-700;
+}
+
+.tr {
+    @apply bg-white;
+}
+
+.th {
+    @apply whitespace-nowrap font-medium text-gray-900;
+}
+
+b {
+    @apply font-bold;
+}
+
+i {
+    @apply italic;
+}
+
+.container {
+    max-width: 77rem;
+    @apply mx-auto;
+}
+
+.at:after {
+    content: '@';
+}
+
+.fancy-link {
+    display: inline;
+    background-image: linear-gradient(black, black);
+    background-size: 0 0.1em;
+    background-position-y: 100%;
+    background-position-x: 0%;
+    background-repeat: no-repeat;
+    transition: background-size 0.2s ease-in-out;
+}
+
+.fancy-link.link-white {
+    background-image: linear-gradient(white, white) !important;
+}
+
+
+.fancy-link:hover, .fancy-link:focus, .group:hover .fancy-link {
+    background-size: 100% 0.1em;
+}
+
+.group-hover-scale {
+    @apply transform transition-transform duration-300 ease-in-out group-hover:scale-105;
+}
+
+article a {
+    @apply text-blue-600 hover:underline;
+}
+
+article ul {
+    @apply list-inside list-disc;
+}
+
+article ol {
+    @apply list-inside list-decimal;
+}
+
+article p {
+    @apply mb-3;
+}
+
+article h1 {
+    @apply font-bold text-4xl;
+}
+
+article h2 {
+    @apply font-bold text-3xl;
+}
+
+article h3 {
+    @apply font-bold text-2xl;
+}
+
+article h4 {
+    @apply font-bold text-xl;
+}
+
+article h5 {
+    @apply font-bold text-lg;
+}
+
+article h6 {
+    @apply font-bold text-base;
+}
+
+article img {
+    @apply rounded-lg text-center max-w-96 mx-auto mb-3;
+}
+
+.alumni-big-pic-box {
+    box-shadow: -2rem 2rem var(--standard-red);
+}
+
+.project-big-pic-box {
+    box-shadow: -2rem 2rem var(--standard-blue);
+}

@@ -1,0 +1,192 @@
+generator client {
+  provider        = "prisma-client"
+  previewFeatures = ["fullTextSearchPostgres"]
+  output          = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        Int            @id
+  name      String
+  pinyin    String
+  phone     String?
+  roles     Role[]
+  logs      UserAuditLog[]
+  type      UserType
+  gender    Gender
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  feishuOpenId String? @unique
+
+  ownedEntities ContentEntity[]
+  ownedImages   Image[]
+}
+
+enum Role {
+  admin
+  editor
+  writer
+}
+
+enum UserType {
+  student
+  teacher
+}
+
+enum Gender {
+  male
+  female
+  others
+}
+
+enum UserAuditLogType {
+  login
+
+  autoCreatePost
+
+  writerCreateEntity
+  writerEditEntity
+  editorApproveEntity
+  adminApproveEntity
+  adminPublishEntity
+
+  unpublishEntity
+  deleteEntity
+
+  uploadImage
+  deleteImage
+}
+
+enum EntityType {
+  post
+  page
+  club
+  activity
+  project
+  course
+  faculty
+}
+
+model UserAuditLog {
+  id     Int              @id @default(autoincrement())
+  time   DateTime         @default(now())
+  type   UserAuditLogType
+  user   User?            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int?
+  values String[]
+}
+
+model ContentEntity {
+  id                      Int          @id @default(autoincrement())
+  type                    EntityType
+  titlePublishedEN        String?
+  titlePublishedZH        String?
+  titleDraftEN            String
+  titleDraftZH            String
+  slug                    String       @unique
+  categoryEN              String?
+  categoryZH              String?
+  shortContentPublishedEN String?
+  shortContentPublishedZH String?
+  shortContentDraftEN     String?
+  shortContentDraftZH     String?
+  contentPublishedEN      String? // Markdown OR Puck data
+  contentPublishedZH      String? // Markdown OR Puck data
+  contentDraftEN          String // Markdown OR Puck data
+  contentDraftZH          String // Markdown OR Puck data
+  coverImagePublished     Image?       @relation("linkedEntitiesPub", fields: [coverImagePublishedId], references: [id], onDelete: SetNull)
+  coverImagePublishedId   Int?
+  coverImageDraft         Image?       @relation("linkedEntitiesDraft", fields: [coverImageDraftId], references: [id], onDelete: SetNull)
+  coverImageDraftId       Int?
+  creatorId               Int
+  creator                 User         @relation(fields: [creatorId], references: [id])
+  createdAt               DateTime     @default(now())
+  updatedAt               DateTime     @updatedAt
+  locks                   EntityLock[]
+  siteStructureItem       SiteStructureItem?
+}
+
+model Image {
+  id         Int      @id @default(autoincrement())
+  sha1       String   @unique
+  name       String
+  altText    String
+  width      Int
+  height     Int
+  sizeKB     Int
+  uploader   User?    @relation(fields: [uploaderId], references: [id], onDelete: SetNull)
+  uploaderId Int?
+  createdAt  DateTime @default(now())
+
+  linkedEntitiesDraft ContentEntity[] @relation("linkedEntitiesDraft")
+  linkedEntitiesPub   ContentEntity[] @relation("linkedEntitiesPub")
+}
+
+model Approval {
+  id         Int        @id @default(autoincrement())
+  entityType EntityType
+  entityId   Int
+  role       Role
+  userId     Int
+  createdAt  DateTime   @default(now())
+
+  @@unique([entityType, entityId, role, userId])
+  @@index([entityType, entityId])
+}
+
+model ApprovalConfig {
+  id         Int        @id @default(autoincrement())
+  entityType EntityType @unique
+  minEditor  Int        @default(1)
+  minAdmin   Int        @default(1)
+}
+
+model EntityLock {
+  id         Int           @id @default(autoincrement())
+  entityType EntityType
+  entityId   Int
+  entity     ContentEntity @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  lockedBy   Int
+  lockedAt   DateTime      @default(now())
+  token      String
+
+  @@unique([entityType, entityId])
+  @@index([lockedBy])
+}
+
+model FeishuMessage {
+  id          String    @id @default(cuid())
+  type        String // 'approval_request', 'approval_approved', etc.
+  recipient   String // 用户名
+  recipientId String // 飞书 open_id
+  content     String
+  status      String    @default("pending") // 'pending', 'sent', 'failed'
+  createdAt   DateTime  @default(now())
+  sentAt      DateTime?
+  error       String?
+}
+
+model SiteStructureItem {
+  id           Int                 @id @default(autoincrement())
+  titleEN      String
+  titleZH      String
+  slug         String
+  jumpLabelEN  String?
+  jumpLabelZH  String?
+  jumpDescriptionEN String?
+  jumpDescriptionZH String?
+  parentId     Int?
+  parent       SiteStructureItem?  @relation("SiteStructureChildren", fields: [parentId], references: [id], onDelete: SetNull)
+  children     SiteStructureItem[] @relation("SiteStructureChildren")
+  position     Int                 @default(0)
+  pageEntityId Int?                @unique
+  pageEntity   ContentEntity?      @relation(fields: [pageEntityId], references: [id], onDelete: SetNull)
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+
+  @@index([parentId, position])
+}
